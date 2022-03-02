@@ -1,21 +1,11 @@
 package com.formacionspringboot.apirest.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,25 +15,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.formacionspringboot.apirest.entity.Cliente;
-import com.formacionspringboot.apirest.service.ClienteService;
+import com.formacionspringboot.apirest.entity.Articulo;
+import com.formacionspringboot.apirest.service.ArticuloService;
 
 
 @RestController
 @RequestMapping("/api")
-public class ClienteRestController {
+public class ArticuloRestController {
 
-	@Autowired
-	private ClienteService clienteService;
 	
-	@GetMapping({"/clientes", "/todos"})
-	public List<Cliente> index(){
-		return clienteService.findAll();
+	
+	@Autowired
+	private ArticuloService articuloService;
+	
+	@GetMapping({"/articulos", "/todos"})
+	public List<Articulo> index(){
+		return articuloService.findAll();
 	}
 	
 //	@GetMapping("clientes/{id}")
@@ -51,14 +41,14 @@ public class ClienteRestController {
 //		return clienteService.findById(id);
 //	}
 	
-	@GetMapping("clientes/{id}")
+	@GetMapping("articulos/{id}")
 	public ResponseEntity<?> findById(@PathVariable Long id){
-		Cliente cliente = null;
+		Articulo articulo = null;
 		Map<String, Object> response = new HashMap<>();
 		
 		try {
 			
-			cliente = clienteService.findById(id);
+			articulo = articuloService.findById(id);
 			
 		} catch (DataAccessException e) {
 			response.put("mensaje", "Error al reallizar consulta a base de datos");
@@ -68,13 +58,13 @@ public class ClienteRestController {
 			
 		}
 		
-		if(cliente == null) {
-			response.put("mensaje", "El cliente ID: ".concat(id.toString().concat(" no existe en la base de datos")));
+		if(articulo == null) {
+			response.put("mensaje", "El articulo ID: ".concat(id.toString().concat(" no existe en la base de datos")));
 			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.NOT_FOUND);
 		}
 
 		
-		return new ResponseEntity<Cliente>(cliente, HttpStatus.OK);
+		return new ResponseEntity<Articulo>(articulo, HttpStatus.OK);
 		
 	}
 	
@@ -84,13 +74,13 @@ public class ClienteRestController {
 //		return clienteService.save(cliente);
 //	}
 	
-	@PostMapping("/cliente")
-	public ResponseEntity<?> saveCliente(@RequestBody Cliente cliente){
-		Cliente clienteNuevo = null;
+	@PostMapping("/articulo")
+	public ResponseEntity<?> saveCliente(@RequestBody Articulo articulo){
+		Articulo articuloNuevo = null;
 		Map<String, Object> response = new HashMap<>();
 		
 		try {
-			clienteNuevo = clienteService.save(cliente);
+			articuloNuevo = articuloService.save(articulo);
 		} catch (DataAccessException e) {
 			response.put("mensaje", "Error al insertar");
 			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
@@ -99,8 +89,8 @@ public class ClienteRestController {
 			
 		}
 		
-		response.put("mensaje", "El cliente ha sido creado con éxito");
-		response.put("cliente", clienteNuevo);
+		response.put("mensaje", "El articulo ha sido creado con éxito");
+		response.put("articulo", articuloNuevo);
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
@@ -118,28 +108,27 @@ public class ClienteRestController {
 //		return clienteService.save(clienteUpdate);	
 //	}
 	
-	@PutMapping("/cliente/{id}")
+	@PutMapping("/articulo/{id}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> updateCliente(@RequestBody Cliente cliente, @PathVariable Long id) {
-		Cliente clienteActual = clienteService.findById(id);
+	public ResponseEntity<?> updateArticulo(@RequestBody Articulo articulo, @PathVariable Long id) {
+		Articulo articuloActual = articuloService.findById(id);
 		Map<String, Object> response = new HashMap<>();
 		
-		if (clienteActual == null) {
-			response.put("mensaje", "El cliente ID: ".concat(id.toString().concat(" no existe en la base de datos")));
+		if (articuloActual == null) {
+			response.put("mensaje", "El articulo ID: ".concat(id.toString().concat(" no existe en la base de datos")));
 			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.NOT_FOUND);
 		}
 		
 		try{
-			clienteActual.setApellidos(cliente.getApellidos());
-			clienteActual.setNombre(cliente.getNombre());
-			clienteActual.setEmpresa(cliente.getEmpresa());
-			clienteActual.setPuesto(cliente.getPuesto());
-			clienteActual.setCp(cliente.getCp());
-			clienteActual.setProvincia(cliente.getProvincia());
-			clienteActual.setTelefono(cliente.getTelefono());
-			clienteActual.setFechaNacimiento(cliente.getFechaNacimiento());
+			articuloActual.setNombre(articulo.getNombre());
+			articuloActual.setDescripcion(articulo.getDescripcion());
+			articuloActual.setPrecioUnidad(articulo.getPrecioUnidad());
+			articuloActual.setUnidadesStock(articulo.getUnidadesStock());
+			articuloActual.setStockSeguridad(articulo.getStockSeguridad());
+			articuloActual.setImagen(articulo.getImagen());
+		
 			
-			clienteService.save(clienteActual);
+			articuloService.save(articuloActual);
 		}catch (DataAccessException e) {
 			response.put("mensaje", "Error al realizar update");
 			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
@@ -147,8 +136,8 @@ public class ClienteRestController {
 			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		response.put("mensaje", "El cliente ha sido actualizado con éxito");
-		response.put("cliente", clienteActual);
+		response.put("mensaje", "El articulo ha sido actualizado con éxito");
+		response.put("articulo", articuloActual);
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);	
 	}
@@ -162,34 +151,35 @@ public class ClienteRestController {
 //		return clienteEliminado;
 //	}
 	
-	@DeleteMapping("/cliente/{id}")
+	@DeleteMapping("/articulo/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<?> deleteCliente(@PathVariable Long id){
+	public ResponseEntity<?> deleteArticulo(@PathVariable Long id){
 		
-		Cliente clienteEliminado = clienteService.findById(id);
+		Articulo articuloEliminado = articuloService.findById(id);
 		Map<String, Object> response = new HashMap<>();
 		
-		if (clienteEliminado == null) {
-			response.put("mensaje", "El cliente ID: ".concat(id.toString().concat(" no existe en la base de datos")));
+		if (articuloEliminado == null) {
+			response.put("mensaje", "El articulo ID: ".concat(id.toString().concat(" no existe en la base de datos")));
 			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.NOT_FOUND);
 		}
 		
 		try {
-			clienteService.delete(id);
+			articuloService.delete(id);
 			
 			
 		} catch (DataAccessException e) {
-			response.put("mensaje", "Error al eliminar el cliente");
+			response.put("mensaje", "Error al eliminar el articulo");
 			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
 			
 			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 			
 		}
 		
-		response.put("mensaje", "El cliente ha sido eliminado con éxito");
-		response.put("cliente", clienteEliminado);
+		response.put("mensaje", "El articulo ha sido eliminado con éxito");
+		response.put("articulo", articuloEliminado);
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 	
 }
+
