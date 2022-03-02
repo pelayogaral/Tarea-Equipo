@@ -24,6 +24,7 @@ public class Cliente {
 	private String provincia;
 	private int telefono;
 	private Date fechaNacimiento;
+	
 	public String getNombre() {
 		return nombre;
 	}

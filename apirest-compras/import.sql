@@ -1,1 +1,0 @@
-INSERT INTO articulos (codArticulo,nombre,descripcion,precioUnidad,unidadesStock,stockSeguridad,imagen) values('12345','camiseta','blanca',1,10,5,'imagen');
