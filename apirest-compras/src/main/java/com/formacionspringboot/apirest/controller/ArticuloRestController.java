@@ -1,8 +1,14 @@
 package com.formacionspringboot.apirest.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -15,8 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.formacionspringboot.apirest.entity.Articulo;
 import com.formacionspringboot.apirest.service.ArticuloService;
@@ -36,10 +44,6 @@ public class ArticuloRestController {
 		return articuloService.findAll();
 	}
 	
-//	@GetMapping("clientes/{id}")
-//	public Cliente findById(@PathVariable Long id){
-//		return clienteService.findById(id);
-//	}
 	
 	@GetMapping("articulos/{id}")
 	public ResponseEntity<?> findById(@PathVariable Long id){
@@ -68,11 +72,6 @@ public class ArticuloRestController {
 		
 	}
 	
-//	@PostMapping("/cliente")
-//	@ResponseStatus(HttpStatus.CREATED)
-//	public Cliente saveCliente(@RequestBody Cliente cliente) {
-//		return clienteService.save(cliente);
-//	}
 	
 	@PostMapping("/articulo")
 	public ResponseEntity<?> saveCliente(@RequestBody Articulo articulo){
@@ -95,18 +94,6 @@ public class ArticuloRestController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 	
-//	@PutMapping("/cliente/{id}")
-//	@ResponseStatus(HttpStatus.CREATED)
-//	public Cliente updateCliente(@RequestBody Cliente cliente, @PathVariable Long id) {
-//		Cliente clienteUpdate = clienteService.findById(id);
-//		clienteUpdate.setApellido(cliente.getApellido());
-//		clienteUpdate.setNombre(cliente.getNombre());
-//		clienteUpdate.setEmail(cliente.getEmail());
-//		clienteUpdate.setTelefono(cliente.getTelefono());
-//		clienteUpdate.setCreatedAt(cliente.getCreatedAt());
-//		
-//		return clienteService.save(clienteUpdate);	
-//	}
 	
 	@PutMapping("/articulo/{id}")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -141,15 +128,7 @@ public class ArticuloRestController {
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);	
 	}
-	
-//	@DeleteMapping("/cliente/{id}")
-//	@ResponseStatus(HttpStatus.OK)
-//	public Cliente deleteCliente(@PathVariable Long id) {
-//		Cliente clienteEliminado = findById(id);
-//		clienteService.delete(id);
-//		
-//		return clienteEliminado;
-//	}
+
 	
 	@DeleteMapping("/articulo/{id}")
 	@ResponseStatus(HttpStatus.OK)
@@ -164,6 +143,17 @@ public class ArticuloRestController {
 		}
 		
 		try {
+			
+			String fotoAnterior = articuloEliminado.getImagen();		
+			if(fotoAnterior != null && fotoAnterior.length() > 0) 
+			{
+				Path rutaAnterior = Paths.get("uploads").resolve(fotoAnterior).toAbsolutePath();
+				File archivoAnterior = rutaAnterior.toFile();
+				if(archivoAnterior.exists() && archivoAnterior.canRead())
+				{
+					archivoAnterior.delete();
+				}
+			}	
 			articuloService.delete(id);
 			
 			
@@ -181,5 +171,44 @@ public class ArticuloRestController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping("/articulo/upload")
+	public ResponseEntity<?> uploadImagen(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id)
+	{
+		Map<String,Object> response = new HashMap<>();
+		
+		Articulo articulo = articuloService.findById(id);
+		if(!archivo.isEmpty()) 
+		{
+			String nombreArchivo = UUID.randomUUID().toString()+"_"+archivo.getOriginalFilename().replace(" ", "");
+			Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();	
+			try 
+			{			
+				Files.copy(archivo.getInputStream(), rutaArchivo);
+									
+			} catch (IOException e) {
+				
+				response.put("mensaje", "Error al subir la imagen");
+				response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
+				return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			String fotoAnterior = articulo.getImagen();
+			
+			if(fotoAnterior != null && fotoAnterior.length() > 0) 
+			{
+				Path rutaAnterior = Paths.get("uploads").resolve(fotoAnterior).toAbsolutePath();
+				File archivoAnterior = rutaAnterior.toFile();
+				if(archivoAnterior.exists() && archivoAnterior.canRead())
+				{
+					archivoAnterior.delete();
+				}
+			}		
+			
+			articulo.setImagen(nombreArchivo);
+			articuloService.save(articulo);
+			response.put("mensaje", "La imagen "+ nombreArchivo +" ha sido subida con exito");
+			response.put("articulo", articulo);
+		}	
+		return new ResponseEntity<Map<String,Object>>(response, HttpStatus.CREATED);
+	}
 }
 

@@ -3,6 +3,7 @@ package com.formacionspringboot.apirest.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.formacionspringboot.apirest.dao.CompraDAO;
@@ -10,6 +11,7 @@ import com.formacionspringboot.apirest.entity.Articulo;
 import com.formacionspringboot.apirest.entity.Cliente;
 import com.formacionspringboot.apirest.entity.Compra;
 
+@Service
 public class CompraServiceImpl implements CompraService{
 
 	@Autowired

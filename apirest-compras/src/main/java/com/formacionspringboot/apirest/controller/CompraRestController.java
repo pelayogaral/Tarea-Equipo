@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.formacionspringboot.apirest.entity.Articulo;
 import com.formacionspringboot.apirest.entity.Cliente;
@@ -23,6 +25,8 @@ import com.formacionspringboot.apirest.service.ArticuloService;
 import com.formacionspringboot.apirest.service.ClienteService;
 import com.formacionspringboot.apirest.service.CompraService;
 
+@RestController
+@RequestMapping("/api")
 public class CompraRestController {
 	
 	@Autowired
@@ -115,11 +119,11 @@ public class CompraRestController {
 			return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		response.put("mensaje", "La compra ha sido actualizado con éxito");
-		response.put("cliente", compraActual);
+		response.put("compra", compraActual);
 		return new ResponseEntity<Map<String,Object>>(response, HttpStatus.CREATED);
 	}
 
-	@DeleteMapping("/cliente/{id}")
+	@DeleteMapping("/compra/{id}")
 	public ResponseEntity<?> deleteCliente(@PathVariable Long id)
 	{
 		Compra compraEliminada = servicio.findById(id);	
@@ -140,7 +144,7 @@ public class CompraRestController {
 			return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		response.put("mensaje", "La compra ha sido eliminado con éxito");
-		response.put("cliente", compraEliminada);
+		response.put("compra", compraEliminada);
 		return new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK);
 	}
 	
