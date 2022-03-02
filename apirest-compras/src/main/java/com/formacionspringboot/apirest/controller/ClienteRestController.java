@@ -30,9 +30,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.springmvc.app.entity.Cliente;
-import com.springmvc.app.entity.Region;
-import com.springmvc.app.service.ClienteService;
+import com.formacionspringboot.apirest.entity.Cliente;
+
 
 @RestController
 @RequestMapping("/api")
@@ -130,11 +129,14 @@ public class ClienteRestController {
 		}
 		
 		try{
-			clienteActual.setApellido(cliente.getApellido());
+			clienteActual.setApellidos(cliente.getApellidos());
 			clienteActual.setNombre(cliente.getNombre());
-			clienteActual.setEmail(cliente.getEmail());
+			clienteActual.setEmpresa(cliente.getEmpresa());
+			clienteActual.setPuesto(cliente.getPuesto());
+			clienteActual.setCp(cliente.getCp());
+			clienteActual.setProvincia(cliente.getProvincia());
 			clienteActual.setTelefono(cliente.getTelefono());
-			clienteActual.setCreatedAt(cliente.getCreatedAt());
+			clienteActual.setFechaNacimiento(cliente.getFechaNacimiento());
 			
 			clienteService.save(clienteActual);
 		}catch (DataAccessException e) {
@@ -197,74 +199,4 @@ public class ClienteRestController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping("cliente/upload")
-	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id){
-		
-		Map<String, Object> response = new HashMap<>();
-		Cliente cliente = clienteService.findById(id);
-		
-		if (!archivo.isEmpty()) {
-//			String nombreArchivo = archivo.getOriginalFilename();
-			String nombreArchivo = UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename().replace(" ", "");
-			Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
-			
-			try {
-				Files.copy(archivo.getInputStream(), rutaArchivo);
-				
-			} catch (IOException e) {
-				response.put("mensaje", "Error al subir la imagen");
-				response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
-				
-				return new ResponseEntity<Map<String,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-			
-			String imagenAnterior = cliente.getImagen();
-			
-			if (imagenAnterior != null && imagenAnterior.length()>0) {
-				Path rutaAnterior = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
-				File archivoAnterior = rutaAnterior.toFile();
-				
-				if (archivoAnterior.exists() && archivoAnterior.canRead()) {
-					archivoAnterior.delete();
-				}
-			}
-			
-			cliente.setImagen(nombreArchivo);
-			clienteService.save(cliente);
-			
-			response.put("cliente", cliente);
-			response.put("mensaje", "La imagen " + nombreArchivo + " ha sido subida correctamente.");
-		}
-		
-		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
-	}
-	
-	@GetMapping("/uploads/imagen/{nombreImagen:.+}")
-	public ResponseEntity<Resource> verImagen(@PathVariable String nombreImagen){
-		
-		Path rutaImagen = Paths.get("uploads").resolve(nombreImagen).toAbsolutePath();
-		Resource resource = null;
-		
-		try {
-			resource = new UrlResource(rutaImagen.toUri());
-			
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		
-		if (!resource.exists() && !resource.isReadable()) {
-			throw new RuntimeException("Error, no se puede cargar la imagen " + nombreImagen);
-		}
-		
-		HttpHeaders cabecera = new HttpHeaders();
-		cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\" " + resource.getFilename() + "\"");
-		
-		return new ResponseEntity<Resource>(resource, HttpStatus.OK);
-	}
-	
-	@GetMapping("/clientes/regiones")
-	public List<Region> listarRegiones(){
-		return clienteService.findAllRegions();
-	}
 }
