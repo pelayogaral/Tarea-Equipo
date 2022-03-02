@@ -1,21 +1,11 @@
 package com.formacionspringboot.apirest.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,10 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.formacionspringboot.apirest.entity.Cliente;
 import com.formacionspringboot.apirest.service.ClienteService;
@@ -46,10 +34,6 @@ public class ClienteRestController {
 		return clienteService.findAll();
 	}
 	
-//	@GetMapping("clientes/{id}")
-//	public Cliente findById(@PathVariable Long id){
-//		return clienteService.findById(id);
-//	}
 	
 	@GetMapping("clientes/{id}")
 	public ResponseEntity<?> findById(@PathVariable Long id){
@@ -78,11 +62,6 @@ public class ClienteRestController {
 		
 	}
 	
-//	@PostMapping("/cliente")
-//	@ResponseStatus(HttpStatus.CREATED)
-//	public Cliente saveCliente(@RequestBody Cliente cliente) {
-//		return clienteService.save(cliente);
-//	}
 	
 	@PostMapping("/cliente")
 	public ResponseEntity<?> saveCliente(@RequestBody Cliente cliente){
@@ -105,18 +84,6 @@ public class ClienteRestController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 	
-//	@PutMapping("/cliente/{id}")
-//	@ResponseStatus(HttpStatus.CREATED)
-//	public Cliente updateCliente(@RequestBody Cliente cliente, @PathVariable Long id) {
-//		Cliente clienteUpdate = clienteService.findById(id);
-//		clienteUpdate.setApellido(cliente.getApellido());
-//		clienteUpdate.setNombre(cliente.getNombre());
-//		clienteUpdate.setEmail(cliente.getEmail());
-//		clienteUpdate.setTelefono(cliente.getTelefono());
-//		clienteUpdate.setCreatedAt(cliente.getCreatedAt());
-//		
-//		return clienteService.save(clienteUpdate);	
-//	}
 	
 	@PutMapping("/cliente/{id}")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -153,14 +120,6 @@ public class ClienteRestController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);	
 	}
 	
-//	@DeleteMapping("/cliente/{id}")
-//	@ResponseStatus(HttpStatus.OK)
-//	public Cliente deleteCliente(@PathVariable Long id) {
-//		Cliente clienteEliminado = findById(id);
-//		clienteService.delete(id);
-//		
-//		return clienteEliminado;
-//	}
 	
 	@DeleteMapping("/cliente/{id}")
 	@ResponseStatus(HttpStatus.OK)
@@ -176,7 +135,6 @@ public class ClienteRestController {
 		
 		try {
 			clienteService.delete(id);
-			
 			
 		} catch (DataAccessException e) {
 			response.put("mensaje", "Error al eliminar el cliente");
