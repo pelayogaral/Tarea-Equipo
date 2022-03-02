@@ -7,23 +7,23 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="articulos")
+@Table(name = "articulos")
 public class Articulo {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String codArticulo;
+	private Long codArticulo;
 	
 	private String nombre;
 	private String descripcion;
 	private double precioUnidad;
-	private int Unidadesstock;
+	private int unidadesStock;
 	private int stockSeguridad;
 	private String imagen;
-	public String getCodArticulo() {
+	public Long getCodArticulo() {
 		return codArticulo;
 	}
-	public void setCodArticulo(String codArticulo) {
+	public void setCodArticulo(Long codArticulo) {
 		this.codArticulo = codArticulo;
 	}
 	public String getNombre() {
@@ -44,11 +44,11 @@ public class Articulo {
 	public void setPrecioUnidad(double precioUnidad) {
 		this.precioUnidad = precioUnidad;
 	}
-	public int getUnidadesstock() {
-		return Unidadesstock;
+	public int getUnidadesStock() {
+		return unidadesStock;
 	}
-	public void setUnidadesstock(int unidadesstock) {
-		Unidadesstock = unidadesstock;
+	public void setUnidadesStock(int unidadesStock) {
+		this.unidadesStock = unidadesStock;
 	}
 	public int getStockSeguridad() {
 		return stockSeguridad;
@@ -61,9 +61,6 @@ public class Articulo {
 	}
 	public void setImagen(String imagen) {
 		this.imagen = imagen;
-	}
+	}	
 	
-	
-	
-
 }
