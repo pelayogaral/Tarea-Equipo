@@ -8,5 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 
 @Repository
 public interface ArticuloDAO  extends CrudRepository<Articulo,Long> {
+	
+	public Articulo findByNombre(String nombre);
 
 }

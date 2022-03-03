@@ -1,5 +1,6 @@
 package com.formacionspringboot.apirest.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,6 @@ public interface CompraDAO extends CrudRepository<Compra, Long>{
 	public List<Articulo> findAllArticulos();
 	@Query("from Cliente")
 	public List<Cliente> findAllClientes();
+	
+	public Compra findByFecha(Date fecha);
 }

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.formacionspringboot.apirest.dao.ArticuloDAO;
 import com.formacionspringboot.apirest.entity.Articulo;
 import com.formacionspringboot.apirest.service.ArticuloService;
 
@@ -38,6 +39,9 @@ public class ArticuloRestController {
 	
 	@Autowired
 	private ArticuloService articuloService;
+	
+	@Autowired
+	private ArticuloDAO repository;
 	
 	@GetMapping({"/articulos", "/todos"})
 	public List<Articulo> index(){
@@ -209,6 +213,34 @@ public class ArticuloRestController {
 			response.put("articulo", articulo);
 		}	
 		return new ResponseEntity<Map<String,Object>>(response, HttpStatus.CREATED);
+	}
+	
+	@GetMapping("articulo/{nombre}")
+	public ResponseEntity<?> buscarPorNombre(@PathVariable String nombre) {
+		Articulo articulo=null;
+		Map<String, Object> response = new HashMap<>();
+
+		
+		
+		try {
+			articulo = repository.findByNombre(nombre);
+
+		} catch (DataAccessException e) {
+			response.put("mensaje", "Error al reallizar consulta a base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+		
+		if(articulo == null) {
+			response.put("mensaje", "El articulo ID: ".concat(nombre.toString().concat(" no existe en la base de datos")));
+			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.NOT_FOUND);
+		}
+		
+		
+
+		return new ResponseEntity<Articulo>(articulo, HttpStatus.OK);
 	}
 }
 

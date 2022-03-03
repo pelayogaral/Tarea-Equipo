@@ -1,5 +1,8 @@
 package com.formacionspringboot.apirest.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.formacionspringboot.apirest.dao.CompraDAO;
 import com.formacionspringboot.apirest.entity.Articulo;
 import com.formacionspringboot.apirest.entity.Cliente;
 import com.formacionspringboot.apirest.entity.Compra;
@@ -35,6 +39,9 @@ public class CompraRestController {
 	ArticuloService servicioArticulo;
 	@Autowired
 	ClienteService servicioCliente;
+	
+	@Autowired
+	CompraDAO repository;
 	
 	@GetMapping({"/compras"})
 	public List<Compra> index(){
@@ -159,5 +166,31 @@ public class CompraRestController {
 	public List<Articulo>listarArticulos()
 	{
 		return servicio.findAllArticulos();
+	}
+	
+	
+	@GetMapping("compra/{fecha}")
+	public ResponseEntity<?> buscarPorFecha(@PathVariable String fecha) throws ParseException {
+		
+		Map<String, Object> response = new HashMap<>();
+
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy/dd/MM"); 
+		Date fecha1 = formato.parse(fecha);
+		
+		Compra compraBuscada = repository.findByFecha(fecha1);
+		try {
+			
+
+		} catch (DataAccessException e) {
+			response.put("mensaje", "Error al reallizar consulta a base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+		
+		
+
+		return new ResponseEntity<Compra>(compraBuscada, HttpStatus.OK);
 	}
 }
