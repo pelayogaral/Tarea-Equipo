@@ -90,7 +90,7 @@ public class CompraRestController {
 	}
 
 	@PutMapping("/compra/{id}")
-	public ResponseEntity<?> updateCliente(@RequestBody Compra compra, @PathVariable Long id)
+	public ResponseEntity<?> updateCompra(@RequestBody Compra compra, @PathVariable Long id)
 	{
 		Compra compraActual = servicio.findById(id);	
 		Map<String,Object> response = new HashMap<>();
@@ -100,11 +100,10 @@ public class CompraRestController {
 			return new ResponseEntity<Map<String,Object>>(response, HttpStatus.NOT_FOUND);
 		}		
 		try 
-		{
-			
+		{		
 			compraActual.setFecha(compra.getFecha());
 			compraActual.setArticulo(compra.getArticulo());
-			compraActual.setFecha(compra.getFecha());			
+			compraActual.setCliente(compra.getCliente());			
 			servicio.save(compraActual);
 		}
 		catch(DataAccessException e)
