@@ -101,15 +101,10 @@ public class CompraRestController {
 		}		
 		try 
 		{
-			Cliente nuevoCliente = servicioCliente.findById(compra.getArticulo().getCodArticulo());
-			if(nuevoCliente == null)
-			{
-				response.put("mensaje", "No se puede editar la compra, el cliente no existe en la base de datos");
-				return new ResponseEntity<Map<String,Object>>(response, HttpStatus.NOT_FOUND);
-			}
+			
 			compraActual.setFecha(compra.getFecha());
 			compraActual.setArticulo(compra.getArticulo());
-			//compraActual.setFecha(compra.getFecha());			
+			compraActual.setFecha(compra.getFecha());			
 			servicio.save(compraActual);
 		}
 		catch(DataAccessException e)
